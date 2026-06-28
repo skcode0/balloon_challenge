@@ -5,10 +5,15 @@ public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
 
-    public float floatForce = 50.0f;
+    public float floatForce = 6.0f;
     public float jumpForce = 5.0f;
     private float gravityModifier = 1.5f;
     private Rigidbody playerRb;
+
+    private float maxHeight;
+    public RepeatBackgroundX backgroundX;
+    private BoxCollider backgroundCollider;
+    private float heightOffset = 5f;
 
     public InputAction floatAction;
 
@@ -18,7 +23,7 @@ public class PlayerControllerX : MonoBehaviour
     private AudioSource playerAudio;
     public AudioClip moneySound;
     public AudioClip explodeSound;
-
+    public AudioClip bounceSound;
 
     // Start is called before the first frame update
     void Start()
@@ -31,13 +36,17 @@ public class PlayerControllerX : MonoBehaviour
         // Apply a small upward force at the start of the game
         playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
+        backgroundCollider = backgroundX.GetComponent<BoxCollider>();
     }
 
     // Update is called once per frame
     void Update()
     {
+        // gets the TOP bound of the collider (size = top - bottom)
+        maxHeight = backgroundCollider.bounds.max.y;
+
         // While space is pressed and player is low enough, float up
-        if (floatAction.IsPressed() && !gameOver)
+        if (floatAction.IsPressed() && !gameOver && (transform.position.y + heightOffset < maxHeight))
         {
             playerRb.AddForce(Vector3.up * floatForce);
         }
@@ -61,9 +70,18 @@ public class PlayerControllerX : MonoBehaviour
             fireworksParticle.Play();
             playerAudio.PlayOneShot(moneySound, 1.0f);
             Destroy(other.gameObject);
-
         }
+        else if (other.gameObject.CompareTag("Ground") && !gameOver)
+        {
+            Bounce();
+        }
+    }
 
+    // Bounce if the balloon is on the ground
+    private void Bounce()
+    {
+        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        playerAudio.PlayOneShot(bounceSound, 1.5f);
     }
 
 }
