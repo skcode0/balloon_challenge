@@ -5,7 +5,8 @@ public class PlayerControllerX : MonoBehaviour
 {
     public bool gameOver;
 
-    public float floatForce;
+    public float floatForce = 50.0f;
+    public float jumpForce = 5.0f;
     private float gravityModifier = 1.5f;
     private Rigidbody playerRb;
 
@@ -26,8 +27,9 @@ public class PlayerControllerX : MonoBehaviour
         playerAudio = GetComponent<AudioSource>();
         floatAction.Enable();
 
+        playerRb = GetComponent<Rigidbody>();
         // Apply a small upward force at the start of the game
-        playerRb.AddForce(Vector3.up * 5, ForceMode.Impulse);
+        playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
 
     }
 
